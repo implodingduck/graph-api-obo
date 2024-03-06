@@ -1,0 +1,4 @@
+fastapi[All]
+msal
+PyJWT
+pydantic-settings
