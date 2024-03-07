@@ -29,20 +29,20 @@ jwt_keys = {}
 @app.on_event("startup")
 async def startup_event():
     print("Starting up")
-    print(f"https://login.microsoftonline.com/{settings.TENANT_ID}/discovery/keys")
+    #print(f"https://login.microsoftonline.com/{settings.TENANT_ID}/discovery/keys")
     response = requests.get(f"https://login.microsoftonline.com/{settings.TENANT_ID}/discovery/keys")
     
     keys = response.json()['keys']
     for k in keys:
-        print(k)
+        #print(k)
         rsa_pem_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(k))
         rsa_pem_key_bytes = rsa_pem_key.public_bytes(
           encoding=serialization.Encoding.PEM, 
           format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
-        print(rsa_pem_key_bytes)
+        #print(rsa_pem_key_bytes)
         jwt_keys[k['kid']] = rsa_pem_key_bytes
-        print("-------------")
+        #print("-------------")
 
 
 app.add_middleware(
