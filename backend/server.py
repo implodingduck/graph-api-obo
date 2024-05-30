@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Query, Header, Request
+from fastapi import FastAPI, Query, Header, Request, Body
 from fastapi.middleware.cors import CORSMiddleware
 import json
-from typing import Union
+from typing import Union, Any
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse, JSONResponse
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -148,3 +148,43 @@ async def graphsearch(request: Request, prompt: Union[str, None] = Query(default
     resp = requests.post("https://graph.microsoft.com/v1.0/search/query", json=search_body, headers=headers)
     
     return {"message": f"Hello from Graph, {prompt}!", "resp": resp.json() }
+
+
+
+@app.post("/generic",
+    tags=["secure"],
+    response_model=dict,
+)
+async def post_generic(request: Request,  payload: Any = Body(None)):
+    access_token = request.state.access_token
+    tokenresp = requests.post(f"https://login.microsoftonline.com/{settings.TENANT_ID}/oauth2/v2.0/token", data={
+        "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+        "client_id": settings.CLIENT_ID,
+        "client_secret": settings.CLIENT_SECRET,
+        "assertion": access_token,
+        "scope": "https://graph.microsoft.com/.default",
+        "requested_token_use": "on_behalf_of",
+    })
+    tokenresp_json = tokenresp.json()
+
+    headers = {
+        "Authorization": f"Bearer {tokenresp_json['access_token']}"
+    }
+    method = payload.get("method", "")
+    path = payload.get("path", "")
+    graphurl = f"https://graph.microsoft.com/v1.0/{path}"
+    print(f"trying...{method} {graphurl}")
+    if method.lower() == "get":
+        resp = requests.get(graphurl, headers=headers)
+        respjson = resp.json()
+    elif method.lower() == "post":
+        genericbody = json.loads(payload.get("body", "\{\}"))
+        resp = requests.post(graphurl, json=genericbody, headers=headers)
+        respjson = resp.json()
+    else:
+        respjson = { "message": "coming soon", "method": method, "path": path}
+    print(respjson)
+    return respjson
+
+
+
