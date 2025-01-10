@@ -53,8 +53,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/assets", StaticFiles(directory="../frontend/dist/assets"), name="assets")
-app.mount("/static", StaticFiles(directory="../frontend/dist/static"), name="static")
+# app.mount("/assets", StaticFiles(directory="../frontend/dist/assets"), name="assets")
+# app.mount("/static", StaticFiles(directory="../frontend/dist/static"), name="static")
 
 exempt_paths = ["/assets", "/static", "/hello", "/favicon.ico"]
 def is_path_exempt(request: Request):
@@ -90,9 +90,9 @@ async def validate_jwt_token(request: Request, call_next):
     response = await call_next(request)
     return response
 
-@app.get("/")
-async def index():
-    return FileResponse('../frontend/dist/index.html')
+# @app.get("/")
+# async def index():
+#     return FileResponse('../frontend/dist/index.html')
 
 @app.get(
     "/hello",
@@ -128,7 +128,7 @@ async def graphsearch(request: Request, prompt: Union[str, None] = Query(default
         "requested_token_use": "on_behalf_of",
     })
     tokenresp_json = tokenresp.json()
-
+    print(tokenresp_json)
     headers = {
         "Authorization": f"Bearer {tokenresp_json['access_token']}"
     }
@@ -166,7 +166,7 @@ async def post_generic(request: Request,  payload: Any = Body(None)):
         "requested_token_use": "on_behalf_of",
     })
     tokenresp_json = tokenresp.json()
-
+    print(tokenresp_json)
     headers = {
         "Authorization": f"Bearer {tokenresp_json['access_token']}"
     }
@@ -178,7 +178,7 @@ async def post_generic(request: Request,  payload: Any = Body(None)):
         resp = requests.get(graphurl, headers=headers)
         respjson = resp.json()
     elif method.lower() == "post":
-        genericbody = json.loads(payload.get("body", "\{\}"))
+        genericbody = json.loads(payload.get("body", "{}"))
         resp = requests.post(graphurl, json=genericbody, headers=headers)
         respjson = resp.json()
     else:

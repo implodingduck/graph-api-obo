@@ -58,7 +58,7 @@ const MainContent = () => {
 
     const handleCallSecure = async () => {
         let bearerToken = await generateBearerToken();
-        const response = await fetch(`http://localhost:8000/secure?prompt=${securename}`, {
+        const response = await fetch(`http://localhost:8888/secure?prompt=${securename}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ const MainContent = () => {
 
     const handleCallGraph = async () => {
         let bearerToken = await generateBearerToken();
-        const response = await fetch(`http://localhost:8000/graph?prompt=${securename}`, {
+        const response = await fetch(`http://localhost:8888/graph?prompt=${securename}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const MainContent = () => {
 
     const handleCallGeneric = async() => {
         let bearerToken = await generateBearerToken();
-        const response = await fetch(`http://localhost:8000/generic`, {
+        const response = await fetch(`http://localhost:8888/generic`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
